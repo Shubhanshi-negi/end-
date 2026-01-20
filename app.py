@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from ultralytics import YOLO
 import cv2
 import numpy as np
+import base64
 
 app = FastAPI()
 model = YOLO("yolov8n.pt")
@@ -16,4 +17,6 @@ async def predict(file: UploadFile = File(...)):
     annotated = results[0].plot()
 
     _, buffer = cv2.imencode(".jpg", annotated)
-    return {"image": buffer.tobytes().hex()}
+
+    encoded = base64.b64encode(buffer).decode("utf-8")
+    return {"image": encoded}
